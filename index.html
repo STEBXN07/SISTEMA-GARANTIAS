@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garantías Credisur-K</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #820AD1;
+            --dark: #111;
+            --card: #1E1E1E;
+            --text: #fff;
+            --success: #00C86F;
+            --danger: #E83F5B;
+            --whatsapp: #25D366; /* Verde WhatsApp */
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--dark);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container { width: 100%; max-width: 800px; }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 20px;
+        }
+        h1 { margin: 0; color: var(--primary); }
+        p { color: #aaa; }
+
+        .form-card {
+            background-color: var(--card);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #ccc; }
+        
+        input {
+            width: 93%; /* Ajuste para móviles */
+            padding: 12px;
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+        }
+        input:focus { outline: none; border-color: var(--primary); }
+
+        /* BOTONES */
+        .btn-main {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-whatsapp {
+            background-color: var(--whatsapp);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        /* LISTA */
+        .history-section { margin-top: 30px; }
+        .garantia-item {
+            background-color: var(--card);
+            border-left: 5px solid gray;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .vigente { border-left-color: var(--success); }
+        .vencida { border-left-color: var(--danger); }
+
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .bg-success { background-color: rgba(0, 200, 111, 0.2); color: var(--success); }
+        .bg-danger { background-color: rgba(232, 63, 91, 0.2); color: var(--danger); }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>CREDISUR-K 🛠️</h1>
+            <p>Sistema Gestor de Garantías v2.0</p>
+        </header>
+
+        <div class="form-card">
+            <div class="input-group">
+                <label>Cliente</label>
+                <input type="text" id="cliente" placeholder="Nombre del cliente">
+            </div>
+            <div class="input-group">
+                <label>Celular (Sin espacios)</label>
+                <input type="number" id="celular" placeholder="Ej: 3120000000">
+            </div>
+            <div class="input-group">
+                <label>Producto</label>
+                <input type="text" id="producto" placeholder="Ej: Ventilador Samurai">
+            </div>
+            <div class="input-group">
+                <label>Fecha de Compra</label>
+                <input type="date" id="fechaCompra">
+            </div>
+            <button class="btn-main" onclick="registrarGarantia()">REGISTRAR GARANTÍA 💾</button>
+        </div>
+
+        <div class="history-section">
+            <h3>📋 Historial Reciente</h3>
+            <div id="listaGarantias"></div>
+            <br>
+            <button onclick="borrarTodo()" style="background:transparent; border:1px solid #444; color:#666; padding:5px;">🗑️ Borrar Todo</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', cargarGarantias);
+
+        function registrarGarantia() {
+            const cliente = document.getElementById('cliente').value;
+            const celular = document.getElementById('celular').value; // NUEVO
+            const producto = document.getElementById('producto').value;
+            const fechaInput = document.getElementById('fechaCompra').value;
+
+            if(!cliente || !producto || !fechaInput) {
+                alert("⚠️ ¡Llene todos los datos, Jefecito!");
+                return;
+            }
+
+            const fechaCompra = new Date(fechaInput);
+            const fechaVence = new Date(fechaCompra);
+            fechaVence.setFullYear(fechaCompra.getFullYear() + 1);
+
+            const hoy = new Date();
+            const esVigente = hoy < fechaVence;
+
+            const nuevaGarantia = {
+                id: Date.now(),
+                cliente,
+                celular, // Guardamos el celular
+                producto,
+                fechaCompra: fechaInput,
+                fechaVence: fechaVence.toISOString().split('T')[0],
+                estado: esVigente ? 'Vigente' : 'Vencida'
+            };
+
+            let historial = JSON.parse(localStorage.getItem('garantias_credisur')) || [];
+            historial.unshift(nuevaGarantia);
+            localStorage.setItem('garantias_credisur', JSON.stringify(historial));
+
+            // Limpiar formulario
+            document.getElementById('cliente').value = '';
+            document.getElementById('celular').value = '';
+            document.getElementById('producto').value = '';
+            cargarGarantias();
+        }
+
+        function cargarGarantias() {
+            const lista = document.getElementById('listaGarantias');
+            const historial = JSON.parse(localStorage.getItem('garantias_credisur')) || [];
+            
+            lista.innerHTML = ''; 
+
+            historial.forEach(item => {
+                const claseBorde = item.estado === 'Vigente' ? 'vigente' : 'vencida';
+                const claseBadge = item.estado === 'Vigente' ? 'bg-success' : 'bg-danger';
+                const icono = item.estado === 'Vigente' ? '✅' : '❌';
+
+                // Lógica del Mensaje de WhatsApp
+                // Asumimos código +57 de Colombia
+                const mensaje = `Hola ${item.cliente}, le saludamos de CREDISUR-K. Su producto *${item.producto}* tiene garantía hasta el *${item.fechaVence}*. Estado actual: ${item.estado} ${icono}. Guarde este mensaje como comprobante.`;
+                const linkWA = `https://wa.me/57${item.celular}?text=${encodeURIComponent(mensaje)}`;
+
+                // Si no puso celular, no mostramos el botón
+                const botonWA = item.celular ? 
+                    `<a href="${linkWA}" target="_blank" class="btn-whatsapp">📲 Enviar a WhatsApp</a>` : '';
+
+                const html = `
+                    <div class="garantia-item ${claseBorde}">
+                        <div>
+                            <strong>${item.producto}</strong> <br>
+                            <small style="color:gray">${item.cliente}</small> <br>
+                            <small>Vence: ${item.fechaVence}</small> <br>
+                            ${botonWA}
+                        </div>
+                        <div style="text-align:right">
+                            <span class="badge ${claseBadge}">${icono} ${item.estado}</span>
+                        </div>
+                    </div>
+                `;
+                lista.innerHTML += html;
+            });
+        }
+
+        function borrarTodo() {
+            if(confirm("¿Seguro que quiere borrar todo el historial?")) {
+                localStorage.removeItem('garantias_credisur');
+                cargarGarantias();
+            }
+        }
+    </script>
+</body>
+</html>
