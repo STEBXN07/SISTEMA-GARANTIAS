@@ -14,6 +14,30 @@ body {
     margin: 0; padding: 20px;
     display: flex; justify-content: center;
 }
+/* REEMPLACE SU CLASE .btn-icon POR ESTO */
+.btn-icon {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem; /* Un poco más grandes */
+    color: #aaa; /* Color base */
+    cursor: pointer;
+    padding: 8px;
+    transition: all 0.3s ease; /* Transición suave */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Efecto al pasar el mouse */
+.btn-icon:hover {
+    color: var(--primary); /* Se ponen del color dorado */
+    transform: scale(1.15); /* Se agrandan un poquito */
+}
+
+/* Ícono de salir (el último) */
+.btn-icon.logout-icon:hover {
+    color: #E83F5B; /* Se pone rojo al pasar el mouse */
+}
 
 .container { width: 100%; max-width: 900px; display: none; }
 
