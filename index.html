@@ -3,231 +3,297 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garantías Credisur-K</title>
+    <title>Garantías Credisur-K (Seguro)</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #820AD1;
-            --dark: #111;
-            --card: #1E1E1E;
+            --primary: #D4AF37; /* Dorado (Tipo Showroom) */
+            --dark: #000;
+            --card: #1a1a1a;
             --text: #fff;
-            --success: #00C86F;
-            --danger: #E83F5B;
-            --whatsapp: #25D366; /* Verde WhatsApp */
+            --input-bg: #333;
         }
 
         body {
             font-family: 'Roboto', sans-serif;
             background-color: var(--dark);
             color: var(--text);
+            margin: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
-            padding: 20px;
-            margin: 0;
         }
 
-        .container { width: 100%; max-width: 800px; }
+        .container { width: 100%; max-width: 900px; display: none; /* Oculto hasta login */ }
+
+        /* PANTALLA DE LOGIN */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 999;
+        }
+        .pin-input {
+            padding: 15px; font-size: 24px; text-align: center; letter-spacing: 10px;
+            width: 150px; border-radius: 10px; border: 2px solid var(--primary);
+            background: #222; color: white; margin-top: 20px;
+        }
 
         header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 20px;
+            text-align: center; border-bottom: 2px solid var(--primary);
+            padding-bottom: 20px; margin-bottom: 30px;
         }
-        h1 { margin: 0; color: var(--primary); }
-        p { color: #aaa; }
+        h1 { margin: 0; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; }
 
         .form-card {
-            background-color: var(--card);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            background-color: var(--card); padding: 25px;
+            border-radius: 15px; border: 1px solid #333;
         }
 
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; color: #ccc; }
+        .row { display: flex; gap: 15px; flex-wrap: wrap; }
+        .col { flex: 1; min-width: 250px; }
+
+        label { display: block; margin-top: 15px; margin-bottom: 5px; color: #aaa; font-size: 14px; }
         
-        input {
-            width: 93%; /* Ajuste para móviles */
-            padding: 12px;
-            background-color: #333;
-            border: 1px solid #444;
-            border-radius: 8px;
-            color: white;
-            font-size: 16px;
+        input, select, textarea {
+            width: 100%; padding: 12px; background-color: var(--input-bg);
+            border: 1px solid #444; border-radius: 8px; color: white;
+            font-size: 16px; box-sizing: border-box;
         }
-        input:focus { outline: none; border-color: var(--primary); }
+        input:focus, textarea:focus { outline: none; border-color: var(--primary); }
 
-        /* BOTONES */
         .btn-main {
-            width: 100%;
-            padding: 15px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
+            width: 100%; padding: 15px; margin-top: 25px;
+            background-color: var(--primary); color: black;
+            border: none; border-radius: 8px; font-size: 18px;
+            font-weight: bold; cursor: pointer; text-transform: uppercase;
         }
 
-        .btn-whatsapp {
-            background-color: var(--whatsapp);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            text-decoration: none;
-            font-size: 14px;
-            display: inline-block;
-            margin-top: 5px;
-        }
-
-        /* LISTA */
-        .history-section { margin-top: 30px; }
+        /* TABLA DE RESULTADOS */
         .garantia-item {
-            background-color: var(--card);
-            border-left: 5px solid gray;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background-color: var(--card); border: 1px solid #333;
+            padding: 20px; margin-bottom: 15px; border-radius: 10px;
         }
-        .vigente { border-left-color: var(--success); }
-        .vencida { border-left-color: var(--danger); }
-
-        .badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-        .bg-success { background-color: rgba(0, 200, 111, 0.2); color: var(--success); }
-        .bg-danger { background-color: rgba(232, 63, 91, 0.2); color: var(--danger); }
+        .item-header { display: flex; justify-content: space-between; align-items: center; }
+        .item-details { 
+            margin-top: 15px; padding-top: 15px; border-top: 1px dashed #444; 
+            font-size: 14px; color: #ccc; display: none; /* Oculto por defecto */
+        }
+        .btn-ver {
+            background: transparent; border: 1px solid var(--primary); color: var(--primary);
+            padding: 5px 10px; cursor: pointer; border-radius: 5px; font-size: 12px;
+        }
+        .img-preview { max-width: 100%; margin-top: 10px; border-radius: 5px; border: 1px solid #555; }
 
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div id="login-screen">
+        <h2 style="color:var(--primary)">SISTEMA DE SEGURIDAD</h2>
+        <p>Credisur-K Admin</p>
+        <input type="password" id="pin" class="pin-input" placeholder="****" maxlength="4" onkeyup="checkPin()">
+        <p id="error-msg" style="color:red; display:none; margin-top:10px;">Acceso Denegado</p>
+    </div>
+
+    <div class="container" id="app">
         <header>
-            <h1>CREDISUR-K 🛠️</h1>
-            <p>Sistema Gestor de Garantías v2.0</p>
+            <h1>Credisur-K</h1>
+            <p>Gestión de Garantías & Servicio Técnico</p>
         </header>
 
         <div class="form-card">
-            <div class="input-group">
-                <label>Cliente</label>
-                <input type="text" id="cliente" placeholder="Nombre del cliente">
+            <h3>📝 Nuevo Registro</h3>
+            
+            <div class="row">
+                <div class="col">
+                    <label>Nombre Completo del Cliente</label>
+                    <input type="text" id="nombre">
+                </div>
+                <div class="col">
+                    <label>Cédula</label>
+                    <input type="number" id="cedula">
+                </div>
             </div>
-            <div class="input-group">
-                <label>Celular (Sin espacios)</label>
-                <input type="number" id="celular" placeholder="Ej: 3120000000">
+
+            <div class="row">
+                <div class="col">
+                    <label>Celular 1 (Principal)</label>
+                    <input type="number" id="cel1">
+                </div>
+                <div class="col">
+                    <label>Celular 2 (Referencia)</label>
+                    <input type="number" id="cel2">
+                </div>
             </div>
-            <div class="input-group">
-                <label>Producto</label>
-                <input type="text" id="producto" placeholder="Ej: Ventilador Samurai">
+
+            <label>Barrio / Dirección exacta</label>
+            <input type="text" id="direccion" placeholder="Ej: B. El Jardín, casa esquina blanca...">
+
+            <div class="row">
+                <div class="col">
+                    <label>Producto</label>
+                    <input type="text" id="producto" placeholder="Ej: Licuadora Oster">
+                </div>
+                <div class="col">
+                    <label>Serial (Opcional)</label>
+                    <input type="text" id="serial" placeholder="S/N...">
+                </div>
             </div>
-            <div class="input-group">
-                <label>Fecha de Compra</label>
-                <input type="date" id="fechaCompra">
-            </div>
-            <button class="btn-main" onclick="registrarGarantia()">REGISTRAR GARANTÍA 💾</button>
+
+            <label>Descripción del Problema</label>
+            <textarea id="problema" rows="3" placeholder="Ej: No prende, huele a quemado..."></textarea>
+
+            <label>Fecha de Compra</label>
+            <input type="date" id="fechaCompra">
+
+            <label>📄 Subir Foto de Factura (Opcional)</label>
+            <input type="file" id="factura" accept="image/*">
+
+            <button class="btn-main" onclick="registrar()">GUARDAR CASO 💾</button>
         </div>
 
-        <div class="history-section">
-            <h3>📋 Historial Reciente</h3>
-            <div id="listaGarantias"></div>
-            <br>
-            <button onclick="borrarTodo()" style="background:transparent; border:1px solid #444; color:#666; padding:5px;">🗑️ Borrar Todo</button>
-        </div>
+        <h3 style="margin-top:40px; border-top: 1px solid #333; padding-top:20px;">📂 Casos Registrados</h3>
+        <input type="text" id="buscador" placeholder="🔍 Buscar por cédula o nombre..." onkeyup="buscar()" style="margin-bottom:20px;">
+        
+        <div id="lista"></div>
+        <br><br>
+        <button onclick="cerrarSesion()" style="background:#333; color:white; border:none; padding:10px;">🔒 Bloquear Pantalla</button>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', cargarGarantias);
+        // 🔒 LOGICA DE SEGURIDAD
+        function checkPin() {
+            const pin = document.getElementById('pin').value;
+            if(pin === "2025") { // CAMBIE ESTE 2025 POR SU CLAVE
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                cargarDatos();
+            }
+        }
 
-        function registrarGarantia() {
-            const cliente = document.getElementById('cliente').value;
-            const celular = document.getElementById('celular').value; // NUEVO
-            const producto = document.getElementById('producto').value;
-            const fechaInput = document.getElementById('fechaCompra').value;
+        function cerrarSesion() {
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('app').style.display = 'none';
+            document.getElementById('pin').value = '';
+        }
 
-            if(!cliente || !producto || !fechaInput) {
-                alert("⚠️ ¡Llene todos los datos, Jefecito!");
+        // 💾 LOGICA DEL SISTEMA
+        async function registrar() {
+            // Recoger datos
+            const data = {
+                id: Date.now(),
+                nombre: document.getElementById('nombre').value,
+                cedula: document.getElementById('cedula').value,
+                cel1: document.getElementById('cel1').value,
+                cel2: document.getElementById('cel2').value,
+                direccion: document.getElementById('direccion').value,
+                producto: document.getElementById('producto').value,
+                serial: document.getElementById('serial').value,
+                problema: document.getElementById('problema').value,
+                fecha: document.getElementById('fechaCompra').value,
+                facturaImg: null // Aquí guardaremos la foto
+            };
+
+            // Validar obligatorios
+            if(!data.nombre || !data.cedula || !data.cel1 || !data.producto || !data.fecha) {
+                alert("⚠️ Faltan datos obligatorios (Nombre, Cédula, Celular, Producto, Fecha)");
                 return;
             }
 
-            const fechaCompra = new Date(fechaInput);
-            const fechaVence = new Date(fechaCompra);
-            fechaVence.setFullYear(fechaCompra.getFullYear() + 1);
+            // Procesar Imagen (Si hay)
+            const fileInput = document.getElementById('factura');
+            if(fileInput.files.length > 0) {
+                data.facturaImg = await toBase64(fileInput.files[0]);
+            }
 
-            const hoy = new Date();
-            const esVigente = hoy < fechaVence;
+            // Guardar
+            let lista = JSON.parse(localStorage.getItem('credisur_db')) || [];
+            lista.unshift(data);
+            localStorage.setItem('credisur_db', JSON.stringify(lista));
 
-            const nuevaGarantia = {
-                id: Date.now(),
-                cliente,
-                celular, // Guardamos el celular
-                producto,
-                fechaCompra: fechaInput,
-                fechaVence: fechaVence.toISOString().split('T')[0],
-                estado: esVigente ? 'Vigente' : 'Vencida'
-            };
-
-            let historial = JSON.parse(localStorage.getItem('garantias_credisur')) || [];
-            historial.unshift(nuevaGarantia);
-            localStorage.setItem('garantias_credisur', JSON.stringify(historial));
-
-            // Limpiar formulario
-            document.getElementById('cliente').value = '';
-            document.getElementById('celular').value = '';
-            document.getElementById('producto').value = '';
-            cargarGarantias();
+            alert("✅ ¡Caso guardado con éxito!");
+            location.reload(); // Recargar para limpiar
         }
 
-        function cargarGarantias() {
-            const lista = document.getElementById('listaGarantias');
-            const historial = JSON.parse(localStorage.getItem('garantias_credisur')) || [];
-            
-            lista.innerHTML = ''; 
+        function cargarDatos(filtro = "") {
+            const contenedor = document.getElementById('lista');
+            contenedor.innerHTML = "";
+            let lista = JSON.parse(localStorage.getItem('credisur_db')) || [];
 
-            historial.forEach(item => {
-                const claseBorde = item.estado === 'Vigente' ? 'vigente' : 'vencida';
-                const claseBadge = item.estado === 'Vigente' ? 'bg-success' : 'bg-danger';
-                const icono = item.estado === 'Vigente' ? '✅' : '❌';
+            // Filtro buscador
+            if(filtro) {
+                lista = lista.filter(item => 
+                    item.nombre.toLowerCase().includes(filtro) || 
+                    item.cedula.includes(filtro)
+                );
+            }
 
-                // Lógica del Mensaje de WhatsApp
-                // Asumimos código +57 de Colombia
-                const mensaje = `Hola ${item.cliente}, le saludamos de CREDISUR-K. Su producto *${item.producto}* tiene garantía hasta el *${item.fechaVence}*. Estado actual: ${item.estado} ${icono}. Guarde este mensaje como comprobante.`;
-                const linkWA = `https://wa.me/57${item.celular}?text=${encodeURIComponent(mensaje)}`;
+            lista.forEach(item => {
+                // Calcular vencimiento
+                const fCompra = new Date(item.fecha);
+                const fVence = new Date(fCompra);
+                fVence.setFullYear(fCompra.getFullYear() + 1);
+                const hoy = new Date();
+                const estado = hoy < fVence ? "✅ VIGENTE" : "❌ VENCIDA";
+                const colorEstado = hoy < fVence ? "#00C86F" : "#E83F5B";
 
-                // Si no puso celular, no mostramos el botón
-                const botonWA = item.celular ? 
-                    `<a href="${linkWA}" target="_blank" class="btn-whatsapp">📲 Enviar a WhatsApp</a>` : '';
-
+                // HTML de cada tarjeta
                 const html = `
-                    <div class="garantia-item ${claseBorde}">
-                        <div>
-                            <strong>${item.producto}</strong> <br>
-                            <small style="color:gray">${item.cliente}</small> <br>
-                            <small>Vence: ${item.fechaVence}</small> <br>
-                            ${botonWA}
+                    <div class="garantia-item">
+                        <div class="item-header">
+                            <div>
+                                <h3 style="margin:0; color:white;">${item.producto}</h3>
+                                <small style="color:var(--primary)">${item.nombre} - C.C. ${item.cedula}</small>
+                            </div>
+                            <div style="text-align:right">
+                                <b style="color:${colorEstado}">${estado}</b><br>
+                                <button class="btn-ver" onclick="toggleDetalles(${item.id})">Ver Detalles ▼</button>
+                            </div>
                         </div>
-                        <div style="text-align:right">
-                            <span class="badge ${claseBadge}">${icono} ${item.estado}</span>
+
+                        <div id="detalles-${item.id}" class="item-details">
+                            <p><strong>📞 Contacto:</strong> ${item.cel1} / ${item.cel2}</p>
+                            <p><strong>📍 Ubicación:</strong> ${item.direccion}</p>
+                            <p><strong>🔧 Problema:</strong> ${item.problema}</p>
+                            <p><strong>🏷️ Serial:</strong> ${item.serial || 'N/A'}</p>
+                            <p><strong>📅 Vence:</strong> ${fVence.toLocaleDateString()}</p>
+                            
+                            ${item.facturaImg ? `<p><strong>📄 Factura:</strong><br><img src="${item.facturaImg}" class="img-preview"></p>` : '<p><em>Sin factura adjunta</em></p>'}
+                            
+                            <button onclick="borrar(${item.id})" style="color:red; background:none; border:none; margin-top:10px; cursor:pointer;">🗑️ Eliminar Caso</button>
                         </div>
                     </div>
                 `;
-                lista.innerHTML += html;
+                contenedor.innerHTML += html;
             });
         }
 
-        function borrarTodo() {
-            if(confirm("¿Seguro que quiere borrar todo el historial?")) {
-                localStorage.removeItem('garantias_credisur');
-                cargarGarantias();
+        // Utilidades
+        function toggleDetalles(id) {
+            const div = document.getElementById(`detalles-${id}`);
+            div.style.display = div.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function buscar() {
+            const texto = document.getElementById('buscador').value.toLowerCase();
+            cargarDatos(texto);
+        }
+
+        function borrar(id) {
+            if(confirm("¿Seguro que quiere borrar este caso? No se puede recuperar.")) {
+                let lista = JSON.parse(localStorage.getItem('credisur_db')) || [];
+                lista = lista.filter(item => item.id !== id);
+                localStorage.setItem('credisur_db', JSON.stringify(lista));
+                cargarDatos();
             }
         }
+
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
     </script>
 </body>
 </html>
